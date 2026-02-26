@@ -1,0 +1,6 @@
+description: AS5600 magnetic rotary encoder input device
+compatible: "zmk,as5600-input"
+properties:
+  "#input-cells":
+    type: int
+    const: 0
