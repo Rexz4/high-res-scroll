@@ -13,5 +13,9 @@ ZMK firmware for AS5600 magnetic rotary encoder BLE scroll wheel on promicro_nrf
 
 ## Build
 ```bash
-$ west build -p -b promicro_nrf52840 -d build/high-res-scroll applications/default-app   --   -DEXTRA_CONF_FILE=$(pwd)/applications/high-res-scroll/prj.conf   -DEXTRA_DTC_OVERLAY_FILE="$(pwd)/applications/high-res-scroll/app.overlay;$(pwd)/applications/high-res-scroll/high-res-scroll.keymap"
+west build -p -b promicro_nrf52840 \
+    -d build/high-res-scroll applications/default-app \
+    -- \
+    -DEXTRA_CONF_FILE="$(pwd)/applications/high-res-scroll/prj.conf" \
+    -DEXTRA_DTC_OVERLAY_FILE="$(pwd)/applications/high-res-scroll/app.overlay;$(pwd)/applications/high-res-scroll/high-res-scroll.keymap"
 ```
