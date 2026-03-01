@@ -1,0 +1,18 @@
+--- a/applications/default-app/CMakeLists.txt
++++ b/applications/default-app/CMakeLists.txt
+@@ -4,6 +4,8 @@ set(CONFIG_APPLICATION_DEFINED_SYSCALL true)
+ set(ZEPHYR_BOARD_ALIASES "boards/aliases.cmake")
+ set(ZEPHYR_EXTRA_MODULES "${ZMK_EXTRA_MODULES};${CMAKE_CURRENT_SOURCE_DIR}/module;${CMAKE_CURRENT_SOURCE_DIR}/keymap-module")
+ 
++list(APPEND DTS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../high-res-scroll)
++
+ # Find Zephyr. This also loads Zephyr's build system.
+ find_package(Zephyr REQUIRED HINTS ../../zephyr)
+ project(zmk)
+@@ -113,3 +115,7 @@ add_subdirectory_ifdef(CONFIG_SETTINGS src/settings/)
+ endif()
+ 
+ zephyr_cc_option(-Wfatal-errors)
++
++target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../high-res-scroll/src/scroll_wheel.c)
++target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../high-res-scroll/src/as5600_input_dev.c)
