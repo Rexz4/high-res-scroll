@@ -1,0 +1,92 @@
+#include <zephyr/dt-bindings/led/led.h>
+
+&pinctrl {
+    i2c0_default: i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 1, 0)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 11)>;
+            bias-pull-up;
+        };
+    };
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 1, 0)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 11)>;
+            low-power-enable;
+        };
+    };
+};
+
+&i2c0 {
+    compatible = "nordic,nrf-twim";
+    status = "okay";
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
+    clock-frequency = <I2C_BITRATE_STANDARD>;
+    as5600: as5600@36 {
+        compatible = "i2c-device";
+        reg = <0x36>;
+    };
+};
+
+/ {
+    chosen {
+        zmk,kscan = &kscan0;
+        zephyr,led-strip = &ws2812;
+    };
+
+    ws2812: ws2812 {
+        compatible = "worldsemi,ws2812-gpio";
+        status = "okay";
+        gpios = <&gpio0 24 GPIO_ACTIVE_HIGH>;
+        chain-length = <1>;
+        color-mapping = <LED_COLOR_ID_GREEN
+                         LED_COLOR_ID_RED
+                         LED_COLOR_ID_BLUE>;
+    };
+    
+    /* Power button on P0 pin for System OFF wakeup support */
+    wakeup_button: wakeup_button {
+        compatible = "gpio-keys";
+        wakeup-source;
+        power_button: button_0 {
+            gpios = <&gpio0 17 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+        };
+    };
+
+    wakeup_trigger: wakeup_trigger {
+        compatible = "zmk,gpio-key-wakeup-trigger";
+        trigger = <&power_button>;
+        wakeup-source;
+    };
+
+    soft_off_wakeup_sources: soft_off_wakeup_sources {
+        compatible = "zmk,soft-off-wakeup-sources";
+        wakeup-sources = <&wakeup_trigger>;
+    };
+
+    buttons {
+        compatible = "gpio-keys";
+        sens_button: button_1 {
+            gpios = <&gpio0 20 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+        };
+    };
+
+    /* Dummy kscan on unused pin to satisfy ZMK keymap requirement */
+    kscan0: kscan {
+        compatible = "zmk,kscan-gpio-direct";
+        wakeup-source;
+        input-gpios = <&gpio0 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+    };
+
+    scroll_input: scroll_input {
+        compatible = "zmk,as5600-input";
+        status = "okay";
+    };
+
+    scroll_listener: scroll_listener {
+        compatible = "zmk,input-listener";
+        device = <&scroll_input>;
+    };
+};
